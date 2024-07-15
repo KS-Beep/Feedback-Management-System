@@ -20,3 +20,16 @@ This project is a Customer Feedback Management System developed using Core Java,
 - Verify the installation by running the following command in your terminal or command prompt:
   ```bash
   java -version
+
+### 2. Download and Install MySQL
+- Download MySQL Community Server from the official MySQL website.
+- Follow the installation instructions for your operating system.
+- During installation, set up a root password that you will use to access the MySQL server.
+- Verify the installation by running the following command in your terminal or command prompt:
+```bash
+mysql -u root -p
+
+### 3. Download and Install an IDE
+- Eclipse
+- Download Eclipse IDE for Java Developers from the official Eclipse website.
+- Follow the installation instructions for your operating system.
