@@ -1,0 +1,142 @@
+package com.feedbackmanagement;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class feedback {
+    public static Connection getConnection() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/feedbackmanagement";
+        String username = "root";
+        String password = "KalpanA@44";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Drivers loaded successfully!!!");
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    public static void insertFeedback(int feedbackId, int customerId, String feedbackText, String status) {
+        String query = "INSERT INTO feedback(feedback_id, customer_id, feedback_date, feedback_text, status) VALUES (" +
+                       feedbackId + ", " + customerId + ", NOW(), '" + feedbackText + "', '" + status + "')";
+
+        try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Insert Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Insertion Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void viewFeedback(int feedbackId) {
+        String query = "SELECT * FROM feedback WHERE feedback_id = " + feedbackId;
+
+        try (Connection con = getConnection(); Statement stmt = con.createStatement(); ResultSet rs = stmt.executeQuery(query)) {
+            while (rs.next()) {
+                System.out.println("Feedback ID: " + rs.getInt("feedback_id"));
+                System.out.println("Customer ID: " + rs.getInt("customer_id"));
+                System.out.println("Feedback Date: " + rs.getTimestamp("feedback_date"));
+                System.out.println("Feedback Text: " + rs.getString("feedback_text"));
+                System.out.println("Status: " + rs.getString("status"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void updateFeedback(int feedbackId, String feedbackText, String status) {
+        String query = "UPDATE feedback SET feedback_text = '" + feedbackText + "', status = '" + status + "' WHERE feedback_id = " + feedbackId;
+
+        try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Update Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Update Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void deleteFeedback(int feedbackId) {
+        String query = "DELETE FROM feedback WHERE feedback_id = " + feedbackId;
+
+        try (Connection con = getConnection(); Statement stmt = con.createStatement()) {
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Delete Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Delete Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Customer Feedback Management System");
+            System.out.println("1. Insert Feedback");
+            System.out.println("2. View Feedback");
+            System.out.println("3. Update Feedback");
+            System.out.println("4. Delete Feedback");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Feedback ID: ");
+                    int feedbackId = scanner.nextInt();
+                    System.out.print("Enter Customer ID: ");
+                    int customerId = scanner.nextInt();
+                    scanner.nextLine(); // consume newline
+                    System.out.print("Enter Feedback Text: ");
+                    String feedbackText = scanner.nextLine();
+                    System.out.print("Enter Status: ");
+                    String status = scanner.nextLine();
+                    insertFeedback(feedbackId, customerId, feedbackText, status);
+                    break;
+                case 2:
+                    System.out.print("Enter Feedback ID: ");
+                    feedbackId = scanner.nextInt();
+                    viewFeedback(feedbackId);
+                    break;
+                case 3:
+                    System.out.print("Enter Feedback ID: ");
+                    feedbackId = scanner.nextInt();
+                    scanner.nextLine(); // consume newline
+                    System.out.print("Enter Updated Feedback Text: ");
+                    feedbackText = scanner.nextLine();
+                    System.out.print("Enter Updated Status: ");
+                    status = scanner.nextLine();
+                    updateFeedback(feedbackId, feedbackText, status);
+                    break;
+                case 4:
+                    System.out.print("Enter Feedback ID: ");
+                    feedbackId = scanner.nextInt();
+                    deleteFeedback(feedbackId);
+                    break;
+                case 5:
+                    System.out.println("Exiting...");
+                    scanner.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
