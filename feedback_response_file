@@ -1,0 +1,147 @@
+package com.feedbackmanagement;
+
+import java.sql.*;
+import java.util.Scanner;
+
+public class FeedbackResponse {
+    public static Connection getConnection() throws SQLException {
+        String url = "jdbc:mysql://localhost:3306/feedbackmanagement";
+        String username = "root";
+        String password = "KalpanA@44";
+
+        try {
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            System.out.println("Drivers loaded successfully!!!");
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+        }
+
+        return DriverManager.getConnection(url, username, password);
+    }
+
+    public static void insertResponse(int responseId, int feedbackId, String responseText, String status) {
+        String query = "INSERT INTO response(response_id, feedback_id, response_date, response_text, status) VALUES (" +
+                       responseId + ", " + feedbackId + ", NOW(), '" + responseText + "', '" + status + "')";
+
+        try (Connection con = getConnection()) {
+            Statement stmt = con.createStatement();
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Insert Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Insertion Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void viewResponse(int responseId) {
+        String query = "SELECT * FROM response WHERE response_id = " + responseId;
+
+        try (Connection con = getConnection()) {
+            Statement stmt = con.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+
+            while (rs.next()) {
+                System.out.println("Response ID: " + rs.getInt("response_id"));
+                System.out.println("Feedback ID: " + rs.getInt("feedback_id"));
+                System.out.println("Response Date: " + rs.getTimestamp("response_date"));
+                System.out.println("Response Text: " + rs.getString("response_text"));
+                System.out.println("Status: " + rs.getString("status"));
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void updateResponse(int responseId, String responseText, String status) {
+        String query = "UPDATE response SET response_text = '" + responseText + "', status = '" + status + "' WHERE response_id = " + responseId;
+
+        try (Connection con = getConnection()) {
+            Statement stmt = con.createStatement();
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Update Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Update Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void deleteResponse(int responseId) {
+        String query = "DELETE FROM response WHERE response_id = " + responseId;
+
+        try (Connection con = getConnection()) {
+            Statement stmt = con.createStatement();
+            int rowsAffected = stmt.executeUpdate(query);
+
+            if (rowsAffected > 0) {
+                System.out.println("Delete Successful. " + rowsAffected + " row(s) affected.");
+            } else {
+                System.out.println("Delete Failed!!!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public static void manageResponse() {
+        Scanner scanner = new Scanner(System.in);
+        while (true) {
+            System.out.println("Feedback Response Management System");
+            System.out.println("1. Insert Response");
+            System.out.println("2. View Response");
+            System.out.println("3. Update Response");
+            System.out.println("4. Delete Response");
+            System.out.println("5. Exit to Main Menu");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter Response ID: ");
+                    int responseId = scanner.nextInt();
+                    System.out.print("Enter Feedback ID: ");
+                    int feedbackId = scanner.nextInt();
+                    scanner.nextLine(); // consume newline
+                    System.out.print("Enter Response Text: ");
+                    String responseText = scanner.nextLine();
+                    System.out.print("Enter Status: ");
+                    String status = scanner.nextLine();
+                    insertResponse(responseId, feedbackId, responseText, status);
+                    break;
+                case 2:
+                    System.out.print("Enter Response ID: ");
+                    responseId = scanner.nextInt();
+                    viewResponse(responseId);
+                    break;
+                case 3:
+                    System.out.print("Enter Response ID: ");
+                    responseId = scanner.nextInt();
+                    scanner.nextLine(); // consume newline
+                    System.out.print("Enter Updated Response Text: ");
+                    responseText = scanner.nextLine();
+                    System.out.print("Enter Updated Status: ");
+                    status = scanner.nextLine();
+                    updateResponse(responseId, responseText, status);
+                    break;
+                case 4:
+                    System.out.print("Enter Response ID: ");
+                    responseId = scanner.nextInt();
+                    deleteResponse(responseId);
+                    break;
+                case 5:
+                    System.out.println("Exiting to Main Menu...");
+                    return;
+                default:
+                    System.out.println("Invalid choice. Please try again.");
+            }
+        }
+    }
+}
+
